@@ -18,6 +18,7 @@ import {
 import { useUserContext } from "@/hooks/useUserContext";
 import { PostValidation } from "@/lib/validation";
 import Loader from "../shared/Loader";
+import { useCreatePost } from "@/context/PostProvider";
 
 type PostFormProps = {
   post?: Models.Document;
@@ -45,7 +46,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
     // ACTION = CREATE
     const newPost = await createPost({
       ...value,
-      userId: user.id,
+      userId: user!.id,
     });
 
     if (!newPost) {
