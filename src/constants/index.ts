@@ -6,13 +6,13 @@ export const sidebarLinks = [
   },
   {
     imgURL: "/assets/icons/wallpaper.svg",
-    route: "/explore",
-    label: "Explore",
+    route: "/wall",
+    label: "Wall of oblivion",
   },
   {
     imgURL: "/assets/icons/people.svg",
     route: "/all-users",
-    label: "People",
+    label: "Your Activity",
   },
   {
     imgURL: "/assets/icons/bookmark.svg",
@@ -34,8 +34,8 @@ export const bottombarLinks = [
   },
   {
     imgURL: "/assets/icons/wallpaper.svg",
-    route: "/explore",
-    label: "Explore",
+    route: "/wall",
+    label: "Wall of oblivion",
   },
   {
     imgURL: "/assets/icons/bookmark.svg",

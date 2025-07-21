@@ -1,98 +1,87 @@
-import * as z from "zod";
-import { Models } from "appwrite";
-import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
-  Form,
+  Button,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-  Button,
   Textarea,
-  useToast,
-} from "@/components/ui";
-import { useUserContext } from "@/hooks/useUserContext";
-import { PostValidation } from "@/lib/validation";
-import Loader from "../shared/Loader";
-import { useCreatePost } from "@/context/PostProvider";
+  Form,
+} from "../ui";
+import { PostApi } from "@/api/Post.api";
+import CookieManager from "@/helpers/Cookie";
+import { useForm } from "react-hook-form";
+
+const PostSchema = z.object({
+  content: z.string().min(1, "Content is mandatory"),
+});
 
 type PostFormProps = {
-  post?: Models.Document;
   action: "Create" | "Update";
 };
 
-const PostForm = ({ post, action }: PostFormProps) => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const { user } = useUserContext();
-  const form = useForm<z.infer<typeof PostValidation>>({
-    resolver: zodResolver(PostValidation),
-    defaultValues: {
-      caption: post ? post?.caption : "",
-    },
+const PostForm = ({ action }: PostFormProps) => {
+  const form = useForm<z.infer<typeof PostSchema>>({
+    resolver: zodResolver(PostSchema),
+    defaultValues: { content: "" },
   });
 
-  // Query
-  const { mutateAsync: createPost, isLoading: isLoadingCreate } =
-    useCreatePost();
+  const handleSubmit = async (data: z.infer<typeof PostSchema>) => {
+    try {
+    const accessToken = CookieManager.getCookie("accessToken"); 
 
-  // Handler
-  const handleSubmit = async (value: z.infer<typeof PostValidation>) => {
+    if (!accessToken) throw new Error("Token não encontrado");
+      const post = await PostApi.create(data, accessToken);
 
-    // ACTION = CREATE
-    const newPost = await createPost({
-      ...value,
-      userId: user!.id,
-    });
-
-    if (!newPost) {
-      toast({
-        title: `${action} post failed. Please try again.`,
-      });
+      console.log(data);
+    } catch (error) {
+      console.log(error);
     }
-    navigate("/");
   };
 
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleSubmit)}
-        className="flex flex-col gap-9 w-full  max-w-5xl">
+        className="w-full max-w-2xl mx-auto space-y-6"
+      >
         <FormField
           control={form.control}
-          name="caption"
+          name="content"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="shad-form_label">Caption</FormLabel>
+              <FormLabel className="text-base font-medium text-light-2 mb-2">
+                What's on your mind?
+              </FormLabel>
               <FormControl>
                 <Textarea
-                  className="shad-textarea custom-scrollbar"
                   {...field}
+                  placeholder="Start typing..."
+                  className="min-h-[100px] resize-none rounded-xl border border-dark-4 bg-transparent px-4 py-3 text-light-1 placeholder:text-light-4 focus:outline-none focus:ring-2 focus:ring-primary-500 transition"
                 />
               </FormControl>
-              <FormMessage className="shad-form_message" />
+              <FormMessage className="text-red-400 mt-1 text-sm" />
             </FormItem>
           )}
         />
 
-
-        <div className="flex gap-4 items-center justify-end">
-          <Button
-            type="button"
-            className="shad-button_dark_4"
-            onClick={() => navigate(-1)}>
-            Cancel
-          </Button>
+        <div className="flex items-center justify-end gap-3">
           <Button
             type="submit"
-            className="shad-button_primary whitespace-nowrap"
-            disabled={isLoadingCreate}>
-            {(isLoadingCreate) && <Loader />}
-            {action} Post
+            variant="ghost"
+            className="text-light-3 border border-dark-4 rounded-full px-5 py-2 hover:bg-dark-4 transition"
+          >
+            Cancel
+          </Button>
+
+          <Button
+            type="submit"
+            className="bg-white text-black font-semibold rounded-full px-6 py-2 hover:bg-zinc-200 transition"
+          >
+            {action}
           </Button>
         </div>
       </form>

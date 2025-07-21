@@ -4,13 +4,16 @@ import { BrowserRouter } from "react-router-dom";
 
 import App from "./App";
 import { AuthProvider } from "./context/AuthProvider";
+import { PrologueProvider } from "./context/PrologueContext";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <BrowserRouter>
+  <PrologueProvider>
+    <React.StrictMode>
+      <BrowserRouter>
         <AuthProvider>
           <App />
         </AuthProvider>
-    </BrowserRouter>
-  </React.StrictMode>
+      </BrowserRouter>
+    </React.StrictMode>
+  </PrologueProvider>
 );

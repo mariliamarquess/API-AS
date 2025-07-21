@@ -6,6 +6,7 @@ import SigninForm from "@/_auth/forms/SigninForm";
 
 import "./globals.css";
 import { Home } from "./_root/pages";
+import Wall from "./_root/pages/Wall";
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
         {/* private routes */}
         <Route element={<RootLayout />}>
           <Route index element={<Home />} />
+          <Route path="/wall" element={<Wall />} />
         </Route>
       </Routes>
     </main>

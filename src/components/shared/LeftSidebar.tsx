@@ -5,56 +5,45 @@ import { sidebarLinks } from '@/constants';
 
 const LeftSidebar = () => {
   const { pathname } = useLocation();
-  const { logout, isAuthenticated } = useUserContext();
-
-  console.log(isAuthenticated)
+  const { logout, isAuthenticated, user } = useUserContext();
 
   return (
-    <nav className="leftsidebar">
-      <div className="flex flex-col gap-11">
+    <nav className="leftsidebar h-full w-[270px] hidden md:flex flex-col justify-between px-6 py-8 border-r border-dark-4 bg-gradient-to-b from-dark-1 to-dark-2 shadow-xl">
+      {/* Top section */}
+      <div className="flex flex-col gap-10">
         {/* Logo */}
-        <Link to="/" className="flex gap-3 items-center justify-center">
-          <img
-            src="/assets/icons/logo.svg"
-            alt="logo"
-            width={100}
-            height={36}
-          />
+        <Link to="/" className="flex items-center justify-center mb-2">
+          <img src="/assets/icons/logo.svg" alt="logo" className="w-36 h-auto" />
         </Link>
 
-        {/* Seção de perfil (só mostra se autenticado)
-        {isAuthenticated && (
-          <Link to={`/profile/${user.id}`} className="flex gap-3 items-center">
+        {/* Perfil do usuário */}
+        {isAuthenticated && user && (
+          <div className="flex flex-col items-center gap-3 text-center border-b border-dark-4 pb-6">
             <img
-              src={user.imageUrl || "/profile-placeholder.svg"}
-              alt="profile"
-              className="h-14 w-14 rounded-full"
+              src="/assets/icons/profile-placeholder.svg"
+              alt="user"
+              className="h-16 w-16 rounded-full border-2 border-primary-500 shadow-lg"
             />
             <div className="flex flex-col">
-              <p className="body-bold">
-                {user.name || user.email.split('@')[0]}
-              </p>
-              {user.username && (
-                <p className="small-regular text-light-3">@{user.username}</p>
-              )}
+              <p className="text-white font-bold text-lg">{user.name}</p>
+              <p className="text-light-3 text-sm">@{user.username}</p>
             </div>
-          </Link>
-        )} */}
+          </div>
+        )}
 
-        {/* Links de navegação */}
-        <ul className="flex flex-col gap-6">
+        {/* Navigation */}
+        <ul className="flex flex-col gap-3">
           {sidebarLinks.map((link) => {
             const isActive = pathname === link.route;
             return (
-              <li
-                key={link.label}
-                className={`leftsidebar-link group ${
-                  isActive && 'bg-primary-500'
-                }`}
-              >
+              <li key={link.label}>
                 <NavLink
                   to={link.route}
-                  className="flex gap-4 items-center p-4"
+                  className={`flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-200
+                    ${isActive
+                      ? 'bg-primary-500 text-white shadow-md'
+                      : 'text-light-2 hover:bg-dark-3 hover:text-white'}
+                  `}
                 >
                   <img
                     src={
@@ -63,11 +52,9 @@ const LeftSidebar = () => {
                         : link.imgURL
                     }
                     alt={link.label}
-                    className={`group-hover:invert-white ${
-                      isActive && 'invert-white'
-                    }`}
+                    className="w-5 h-5 transition-transform duration-200 group-hover:scale-110"
                   />
-                  {link.label}
+                  <span>{link.label}</span>
                 </NavLink>
               </li>
             );
@@ -75,15 +62,15 @@ const LeftSidebar = () => {
         </ul>
       </div>
 
-      {/* Botão de Logout (só mostra se autenticado) */}
+      {/* Bottom section: Logout */}
       {isAuthenticated && (
         <Button
           variant="ghost"
-          className="shad-button_ghost"
+          className="flex gap-3 items-center text-light-3 hover:text-white hover:bg-dark-3 px-4 py-3 rounded-xl transition-all duration-200"
           onClick={() => logout()}
         >
-          <img src="/assets/icons/logout.svg" alt="logout" />
-          <p className="small-medium lg:base-medium">Logout</p>
+          <img src="/assets/icons/logout.svg" alt="logout" className="w-5 h-5" />
+          <span className="text-sm font-medium">Logout</span>
         </Button>
       )}
     </nav>

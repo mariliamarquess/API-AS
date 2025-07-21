@@ -1,52 +1,62 @@
+import { useEffect } from 'react';
 import { SignInApi } from '@/api/Signin.api';
-import PostForm from '@/components/form/PostForm';
 import CookieManager from '@/helpers/Cookie';
 import { useUserContext } from '@/hooks/useUserContext';
-import { useEffect } from 'react'
+import CreatePost from './CreatePost';
+import { usePrologue } from '@/context/PrologueContext';
 
 const Home = () => {
-    const { login, isAuthenticated } = useUserContext()
+  const { login, isAuthenticated } = useUserContext();
+  const { isPrologueActive, setIsPrologueActive } = usePrologue();
 
   useEffect(() => {
     (async () => {
       try {
-        const token = CookieManager.getCookie("accessToken");
+        const cookieToken = CookieManager.getCookie("accessToken");
+        const localToken = localStorage.getItem("token");
 
+        const token = cookieToken || localToken;
         if (!token) return;
 
         const user = await SignInApi.show(token);
-
-        login(user, token)
+        login(user, token);
+        setIsPrologueActive(true);
       } catch (error) {
-        console.log(error)
+        console.log("Erro ao autenticar:", error);
       }
-    })()
+    })();
   }, []);
 
-  if (!isAuthenticated) {
-    return <h1>Carregando</h1>
+  useEffect(() => {
+    if (isPrologueActive) {
+      const timer = setTimeout(() => {
+        setIsPrologueActive(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [isPrologueActive]);
+
+  // if (!isAuthenticated) {
+  //   return <h1>Carregando...</h1>;
+  // }
+
+  if (isPrologueActive) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center bg-black transition-opacity duration-500">
+        <div className="flex flex-col items-center text-center gap-4 px-4 animate-fadeIn">
+          <h1 className="text-white text-2xl md:text-4xl font-semibold">
+            “How do you wake up from the matrix when you don't know you're in the matrix?”
+          </h1>
+          <h2 className="text-light-3 text-sm md:text-base italic">The Social Dilemma – 2020</h2>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div>Home</div>
-  )
-}
-
-export const CreatePost = () => {
-  return (
-    <div className="flex flex-1">
-      <div className="common-container">
-        <div className="max-w-5xl flex-start gap-3 justify-start w-full">
-          <img
-            src="/assets/icons/add-post.svg"
-            width={36}
-            height={36}
-            alt="add"
-          />
-          <h2 className="h3-bold md:h2-bold text-left w-full">Create Post</h2>
-        </div>
-
-        <PostForm action="Create" />
+    <div className="overflow-hidden w-full flex">
+      <div className="flex-1">
+        <CreatePost />
       </div>
     </div>
   );
